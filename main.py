@@ -2,6 +2,10 @@ import time
 from slackclient import SlackClient
 import os
 
+hide = """
+I change this so it deploys.
+"""
+
 if os.path.exists('./overrides.py'):
     import overrides
     overrides.main()
