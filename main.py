@@ -56,11 +56,11 @@ def handle_command(command, channel):
         ret = 'shutdown'
     elif command.startswith('add grocery'):
         # grocery is command.split()[1:]
-        grocery = ' '.join(command.split()[1:])
+        grocery = ' '.join(command.split()[2:])
         add_grocery(grocery)
         response = "Added {}".format(grocery)
     elif command.startswith('remove grocery'):
-        grocery = ' '.join(command.split()[1:])
+        grocery = ' '.join(command.split()[2:])
         remove_grocery(grocery)
         response = "Removed {}".format(grocery)
     elif command.startswith('list groceries'):
