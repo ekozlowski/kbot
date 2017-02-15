@@ -19,6 +19,23 @@ READ_WEBSOCKET_DELAY = 2
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
+groceries = []
+
+
+def add_grocery(grocery):
+    global groceries
+    groceries.append(grocery)
+
+
+def remove_grocery(grocery):
+    global groceries
+    groceries.remove(grocery)
+
+def list_groceries():
+    response = """Here are your groceries:\n"""
+    for g in groceries:
+        response += "{}\n".format(g)
+    return response
 
 def handle_command(command, channel):
     """
@@ -28,6 +45,7 @@ def handle_command(command, channel):
     """
     response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
     ret = None
+    global groceries
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...  write some more code, then I can do that."
     elif command.startswith('who is'):
@@ -36,6 +54,20 @@ def handle_command(command, channel):
     elif command.startswith('bot shutdown'):
         response = "Ok... Shutting down."
         ret = 'shutdown'
+    elif command.startswith('add grocery'):
+        # grocery is command.split()[1:]
+        grocery = ' '.join(command.split()[1:])
+        add_grocery(grocery)
+        response = "Added {}".format(grocery)
+    elif command.startswith('remove grocery'):
+        grocery = ' '.join(command.split()[1:])
+        remove_grocery(grocery)
+        response = "Removed {}".format(grocery)
+    elif command.startswith('list groceries'):
+        response = list_groceries()
+    elif command.startswith('clear groceries'):
+        groceries = []
+        response = 'Grocery list cleared.  Hope you got what you needed...'
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
     return ret
 
