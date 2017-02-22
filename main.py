@@ -21,6 +21,7 @@ groceries = []
 
 
 def say(text, channel, as_user=True):
+    print("Saying {}".format(text))
     slack_client.api_call("chat.postMessage", channel=channel, message=text, as_user=as_user)
 
 
