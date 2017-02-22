@@ -2,7 +2,9 @@ import time
 from slackclient import SlackClient
 import os
 
-version = """0.0.1"""
+version = """
+0.0.1
+"""
 
 if os.path.exists('./overrides.py'):
     import overrides
@@ -20,20 +22,9 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)
 groceries = []
 
 
-def say(text, channel, as_user=True):
-    print("Saying {}".format(text))
-    slack_client.api_call("chat.postMessage", channel=channel, message=text, as_user=as_user)
-
-
-def get_version(channel):
-    say('Version: {}'.format(version), channel)
-
-
 def add_grocery(grocery):
     global groceries
     groceries.append(grocery)
-
-
 
 
 def remove_grocery(grocery):
@@ -53,11 +44,35 @@ def handle_command(command, channel):
     are valid commands.  If so, then it acts on the commands.  If not,
     returns back what it needs for clarification.
     """
-    print("Command is: --> {}".format(command))
     response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
+    ret = None
+    global groceries
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...  write some more code, then I can do that."
-    say(response, channel)
+    elif command.startswith('version'):
+        response = version
+    elif command.startswith('who is'):
+        if 'alisa' in command:
+            response = "Alisa is Ed's beautiful wife. :)"
+    elif command.startswith('bot shutdown'):
+        response = "Ok... Shutting down."
+        ret = 'shutdown'
+    elif command.startswith('add grocery'):
+        # grocery is command.split()[1:]
+        grocery = ' '.join(command.split()[2:])
+        add_grocery(grocery)
+        response = "Added {}".format(grocery)
+    elif command.startswith('remove grocery'):
+        grocery = ' '.join(command.split()[2:])
+        remove_grocery(grocery)
+        response = "Removed {}".format(grocery)
+    elif command.startswith('list groceries'):
+        response = list_groceries()
+    elif command.startswith('clear groceries'):
+        groceries = []
+        response = 'Grocery list cleared.  Hope you got what you needed...'
+    slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+    return ret
 
 
 def parse_slack_output(slack_rtm_output):
@@ -78,6 +93,8 @@ def parse_slack_output(slack_rtm_output):
     return None, None
 
 if __name__ == "__main__":
+
+
     if slack_client.rtm_connect():
         print("Bot connected and running!")
         while True:
