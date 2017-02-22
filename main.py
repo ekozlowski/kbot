@@ -54,30 +54,8 @@ def handle_command(command, channel):
     """
     print("Command is: --> {}".format(command))
     response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
-    ret = None
-    global groceries
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...  write some more code, then I can do that."
-    elif command.startswith('who is'):
-        if 'alisa' in command:
-            response = "Alisa is Ed's beautiful wife. :)"
-    elif command.startswith('bot shutdown'):
-        response = "Ok... Shutting down."
-        ret = 'shutdown'
-    elif command.startswith('add grocery'):
-        # grocery is command.split()[1:]
-        grocery = ' '.join(command.split()[2:])
-        add_grocery(grocery)
-        response = "Added {}".format(grocery)
-    elif command.startswith('remove grocery'):
-        grocery = ' '.join(command.split()[2:])
-        remove_grocery(grocery)
-        response = "Removed {}".format(grocery)
-    elif command.startswith('list groceries'):
-        response = list_groceries()
-    elif command.startswith('clear groceries'):
-        groceries = []
-        response = 'Grocery list cleared.  Hope you got what you needed...'
     say(response, channel)
 
 
