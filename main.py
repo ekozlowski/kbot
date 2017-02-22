@@ -52,6 +52,7 @@ def handle_command(command, channel):
     are valid commands.  If so, then it acts on the commands.  If not,
     returns back what it needs for clarification.
     """
+    print("Command is: --> {}".format(command))
     response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
     ret = None
     global groceries
@@ -98,8 +99,6 @@ def parse_slack_output(slack_rtm_output):
     return None, None
 
 if __name__ == "__main__":
-
-
     if slack_client.rtm_connect():
         print("Bot connected and running!")
         while True:
