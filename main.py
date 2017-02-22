@@ -19,24 +19,7 @@ READ_WEBSOCKET_DELAY = 2
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
-groceries = []
-
-
-def add_grocery(grocery):
-    global groceries
-    groceries.append(grocery)
-
-
-def remove_grocery(grocery):
-    global groceries
-    groceries.remove(grocery)
-
-def list_groceries():
-    response = """Here are your groceries:\n"""
-    for g in groceries:
-        response += "{}\n".format(g)
-    return response
-
+from groceries import handler as grocery_handler
 
 def handle_command(command, channel):
     """
@@ -44,34 +27,32 @@ def handle_command(command, channel):
     are valid commands.  If so, then it acts on the commands.  If not,
     returns back what it needs for clarification.
     """
-    response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
     ret = None
-    global groceries
+    response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
     if command.startswith(EXAMPLE_COMMAND):
-        response = "Sure...  write some more code, then I can do that."
+        response = "Sure...  write some more code, then I can do that."  # TODO: Consider making the default a help printout.
+
+    # Version of the bot.
     elif command.startswith('version'):
         response = version
+
+    # Support rudimentary who is behavior.
     elif command.startswith('who is'):
         if 'alisa' in command:
             response = "Alisa is Ed's beautiful wife. :)"
-    elif command.startswith('bot shutdown'):
-        response = "Ok... Shutting down."
-        ret = 'shutdown'
-    elif command.startswith('add grocery'):
-        # grocery is command.split()[1:]
-        grocery = ' '.join(command.split()[2:])
-        add_grocery(grocery)
-        response = "Added {}".format(grocery)
-    elif command.startswith('remove grocery'):
-        grocery = ' '.join(command.split()[2:])
-        remove_grocery(grocery)
-        response = "Removed {}".format(grocery)
-    elif command.startswith('list groceries'):
-        response = list_groceries()
-    elif command.startswith('clear groceries'):
-        groceries = []
-        response = 'Grocery list cleared.  Hope you got what you needed...'
+        elif 'ed' in command:
+            response = "Ed is Alisa's husband, and my creator."
+
+    # TODO: Consider handling bot shutdown / graceful restart.
+    #elif command.startswith('bot shutdown'):
+    #    response = "Ok... Shutting down."
+    #    ret = 'shutdown'
+
+    # Handle groceries.
+    elif command.startswith('grocery'):
+        response = grocery_handler.handle(command)
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+
     return ret
 
 
