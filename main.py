@@ -1,9 +1,10 @@
 import time
 from slackclient import SlackClient
+import groceries
 import os
 
 version = """
-0.0.1
+I'm running version 0.0.1.
 """
 
 if os.path.exists('./overrides.py'):
@@ -19,7 +20,6 @@ READ_WEBSOCKET_DELAY = 2
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
-from groceries import handler as grocery_handler
 
 def handle_command(command, channel):
     """
@@ -28,7 +28,16 @@ def handle_command(command, channel):
     returns back what it needs for clarification.
     """
     ret = None
-    response = "Not sure what you mean.  Use the *{}* command with numbers, delimited by spaces.".format(EXAMPLE_COMMAND)
+    response = '\n'.join([
+        "Not sure what you mean.  :disappointed:",
+        "I support these commands:",
+        "`grocery <command>`",
+        "`version`",
+        "`who is <person name>`",
+        "",
+        "Try one of those commands."
+    ])
+
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...  write some more code, then I can do that."  # TODO: Consider making the default a help printout.
 
@@ -50,7 +59,7 @@ def handle_command(command, channel):
 
     # Handle groceries.
     elif command.startswith('grocery'):
-        response = grocery_handler.handle(command)
+        response = groceries.handle(command)
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
 
     return ret
@@ -74,8 +83,6 @@ def parse_slack_output(slack_rtm_output):
     return None, None
 
 if __name__ == "__main__":
-
-
     if slack_client.rtm_connect():
         print("Bot connected and running!")
         while True:
@@ -88,6 +95,7 @@ if __name__ == "__main__":
     else:
         print("Connection failed.  Invalid Slack token or Bot ID?")
 
+    # get bot name
     hide_me = """
     api_call = slack_client.api_call("users.list")
     if api_call.get('ok'):
