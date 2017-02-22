@@ -2,9 +2,7 @@ import time
 from slackclient import SlackClient
 import os
 
-hide = """
-I change this so it deploys.
-"""
+version = """0.0.1"""
 
 if os.path.exists('./overrides.py'):
     import overrides
@@ -22,9 +20,19 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)
 groceries = []
 
 
+def say(text, channel, as_user=True):
+    slack_client.api_call("chat.postMessage", channel=channel, message=text, as_user=as_user)
+
+
+def get_version(channel):
+    say('Version: {}'.format(version), channel)
+
+
 def add_grocery(grocery):
     global groceries
     groceries.append(grocery)
+
+
 
 
 def remove_grocery(grocery):
@@ -36,6 +44,7 @@ def list_groceries():
     for g in groceries:
         response += "{}\n".format(g)
     return response
+
 
 def handle_command(command, channel):
     """
@@ -68,8 +77,7 @@ def handle_command(command, channel):
     elif command.startswith('clear groceries'):
         groceries = []
         response = 'Grocery list cleared.  Hope you got what you needed...'
-    slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
-    return ret
+    say(response, channel)
 
 
 def parse_slack_output(slack_rtm_output):
