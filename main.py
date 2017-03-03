@@ -41,6 +41,10 @@ def handle_command(command, channel):
     if command.startswith(EXAMPLE_COMMAND):
         response = "Sure...  write some more code, then I can do that."  # TODO: Consider making the default a help printout.
 
+        
+    if command.startswith('demo'):
+        response = "This was done in Github!  Woo!"
+        
     # Version of the bot.
     elif command.startswith('version'):
         response = version
