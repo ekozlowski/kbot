@@ -1,7 +1,7 @@
 import os
 import time
 from slackclient import SlackClient
-from handlers import version, grocery, weather
+from handlers import version, grocery, weather, feeds
 
 if os.path.exists('./overrides.py'):
     import overrides
@@ -21,7 +21,8 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)
 handlers = {
     'version': version,
     'grocery': grocery,
-    'weather': weather
+    'weather': weather,
+    'feeds': feeds
 }
 
 def handle_command(command, channel):
@@ -32,10 +33,11 @@ def handle_command(command, channel):
     """
     # Command is always the very first word - it is what puts us down a logical context path.
     cmd = command.split()[0]
+    response = ""
     if cmd not in handlers:
-        response = '\n'.join([
-        "Not sure what you mean.  :disappointed:",
-        "I support these commands:\n\n"])
+        if cmd.lower() != 'help':
+            response += "Not sure what you mean.  :disappointed:\n"
+        response += "I support these commands:\n\n"
 
         for h in sorted(handlers.keys()):
             response += handlers.get(h).help_text + '\n'
