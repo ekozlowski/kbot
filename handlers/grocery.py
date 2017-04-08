@@ -1,5 +1,6 @@
-grocery_list = []
+help_text = "`grocery <command>` - Use `grocery help` for more info."
 
+grocery_list = []
 
 def handle(command):
     global grocery_list
@@ -13,6 +14,8 @@ def handle(command):
         "`grocery list` lists your groceries.",
         "`grocery clear` clears your list.",
     ])
+    if pieces[0].lower() == 'help':
+        return response
     try:
         action = pieces[1]
     except IndexError:
