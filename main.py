@@ -2,6 +2,8 @@ import os
 import time
 from slackclient import SlackClient
 from handlers import version, grocery, weather, feeds
+import logging
+logging.basicConfig(level=logging.INFO)
 
 if os.path.exists('./overrides.py'):
     import overrides
@@ -54,44 +56,43 @@ def parse_slack_output(slack_rtm_output):
     :param slack_rtm_output:
     :return:
     """
+    log = logging.getLogger('parse_slack_output')
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
         for output in output_list:
             if output and 'text' in output and AT_BOT in output['text']:
                 # return the text after the '@' mention, whitespace removed
-                print(repr(output))
+                log.debug(repr(output))
                 return output['text'].split(AT_BOT)[1].strip().lower(), output['channel']
             else:
-                print("Filtering out this: {}".format(repr(output)))
+                log.debug("Filtering out this: {}".format(repr(output)))
     return None, None
 
 
 def get_user_id_from_user_name(user_name):
+    log = logging.getLogger('get_user_id_from_user_name')
     api_call = slack_client.api_call("users.list")
     if api_call.get('ok'):
         users = api_call.get('members')
         for user in users:
             if 'name' in user and user.get('name') == user_name:
-                user_id = user.get('id')
-                print("User ID for '" + user_name + "' is: " + user.get('id'))
+                log.debug("User ID for '" + user_name + "' is: " + user.get('id'))
                 return user.get('id')
     else:
         print("could not find the user id with user name: " + user_name)
         return None
 
 if __name__ == "__main__":
+    log = logging.getLogger("__main__")
     if slack_client.rtm_connect():
         print("Bot connected and running!")
         while True:
             command, channel = parse_slack_output(slack_client.rtm_read())
             if command and channel:
-                out = handle_command(command, channel)
-                if out == 'shutdown':
-                    break
+                try:
+                    handle_command(command, channel)
+                except Exception:
+                    log.debug(f"Problem handling command: {command} in channel {channel}")
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed.  Invalid Slack token or Bot ID?")
-
-    # get bot name
-    hide_me = """
-    """
