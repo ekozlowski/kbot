@@ -10,8 +10,11 @@ import os
 print(os.environ)
 DARKSKY_API_KEY = os.environ.get('DARKSKY_API_KEY')
 DEBUG = False
+LATITUDE = os.environ.get('LATITUDE')
+LONGITUDE = os.environ.get('LONGITUDE')
 
-def get_darksky_data(latitude=32.9546, longitude=-97.0150):
+
+def get_darksky_data(latitude=LATITUDE, longitude=LONGITUDE):
     if DEBUG:
         if os.path.exists('./darksky_data.json'):  # remove "False" to debug and NOT pull from live.
             print("Pulling from DISK")
@@ -51,6 +54,7 @@ def get_week_forecast():
             day = datetime.datetime.fromtimestamp(d.get('time')).strftime('%A - (%m/%d):')
         forecast += f"{day} {icon_map.get(d.get('icon'))} {d.get('summary')} High: {d.get('temperatureMax'):.0f}F Low: {d.get('temperatureMin'):.0f}F Wind: {d.get('windSpeed'):.0f}mph from the {get_wind_direction(d.get('windBearing'))}"
         forecast += "\n"
+    forecast += "Powered by Darksky - https://darksky.net/poweredby/\n"
     return forecast
 
 def get_summary_forecast():
@@ -85,7 +89,9 @@ def get_current_weather():
     wind_speed = current.get('windSpeed')
     wind_bearing = current.get('windBearing')
     wind_direction = get_wind_direction(wind_bearing)
-    return f"Currently, it's {current_conditions} {icon} and {temperature:.0f} degrees.  It feels like it's {apparent_temperature:.0f} degrees.   Wind is out of the {wind_direction} at {wind_speed:.0f} mph."
+    ret = f"Currently, it's {current_conditions} {icon} and {temperature:.0f} degrees.  It feels like it's {apparent_temperature:.0f} degrees.   Wind is out of the {wind_direction} at {wind_speed:.0f} mph."
+    ret += "\nPowered by Darksky: https://darksky.net/poweredby/\n"
+    return ret
 
 if __name__ == "__main__":
     #print(get_daily_forecast())
