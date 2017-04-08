@@ -5,7 +5,7 @@ from handlers import version, grocery, weather, feeds
 import logging
 from functools import lru_cache
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 if os.path.exists('./overrides.py'):
     import overrides
@@ -103,7 +103,7 @@ if __name__ == "__main__":
                 try:
                     handle_command(command, channel)
                 except Exception:
-                    log.debug(f"Problem handling command: {command} in channel {channel}")
+                    log.error(f"Problem handling command: {command} in channel {channel}")
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed.  Invalid Slack token or Bot ID?")
