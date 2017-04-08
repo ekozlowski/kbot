@@ -1,7 +1,7 @@
 import os
 import time
 from slackclient import SlackClient
-from handlers import version, grocery, weather, feeds
+from handlers import version, grocery, feeds
 import logging
 from functools import lru_cache
 
@@ -10,6 +10,8 @@ logging.basicConfig(level=logging.DEBUG)
 if os.path.exists('./overrides.py'):
     import overrides
     overrides.main()
+from handlers import weather  # Have to import weather *after* the overrides, so it has the API key for DARKSKY.  :(
+
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 BOT_NAME = os.environ.get('BOT_NAME')
