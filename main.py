@@ -3,6 +3,8 @@ import time
 from slackclient import SlackClient
 from handlers import version, grocery, weather, feeds
 import logging
+from functools import lru_cache
+
 logging.basicConfig(level=logging.INFO)
 
 if os.path.exists('./overrides.py'):
@@ -11,9 +13,8 @@ if os.path.exists('./overrides.py'):
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 BOT_NAME = os.environ.get('BOT_NAME')
-BOT_ID = os.environ.get('BOT_ID')
-AT_BOT = "<@{}>".format(BOT_ID)
-EXAMPLE_COMMAND = 'do'
+BOT_ID = None # Established after we connect to Slack
+AT_BOT = None # Established after we connect to Slack
 READ_WEBSOCKET_DELAY = 2
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)
@@ -26,6 +27,13 @@ handlers = {
     'weather': weather,
     'feeds': feeds
 }
+
+
+def establish_bot_identity():
+    global BOT_ID, AT_BOT
+    BOT_ID = get_user_id_from_user_name(BOT_NAME)
+    AT_BOT = f"<@{BOT_ID}>"
+
 
 def handle_command(command, channel):
     """
@@ -69,6 +77,7 @@ def parse_slack_output(slack_rtm_output):
     return None, None
 
 
+@lru_cache(maxsize=10, typed=False)
 def get_user_id_from_user_name(user_name):
     log = logging.getLogger('get_user_id_from_user_name')
     api_call = slack_client.api_call("users.list")
@@ -86,6 +95,7 @@ if __name__ == "__main__":
     log = logging.getLogger("__main__")
     if slack_client.rtm_connect():
         print("Bot connected and running!")
+        establish_bot_identity()
         while True:
             command, channel = parse_slack_output(slack_client.rtm_read())
             if command and channel:

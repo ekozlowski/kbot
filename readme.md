@@ -13,5 +13,6 @@ https://my.slack.com/services/new/bot.  Once you choose a name for your bot, you
 API Token for your bot.  The code written here expects this token to be an environment variable called "SLACK_BOT_TOKEN".
 
 You'll also need to provide the name of your bot in another environment variable called "BOT_NAME".  This is so that the
-bot knows who it is, and when conversations are directed at it.
-
+bot knows who it is, and when conversations are directed at it.  It also uses this name to dynamically grab its id, and 
+uses the ID to figure out if it was mentioned.  (If you inspect messages, you'll see that usernames are not mentioned,
+just User IDs.)
