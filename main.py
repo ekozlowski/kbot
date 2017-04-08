@@ -93,6 +93,7 @@ def get_user_id_from_user_name(user_name):
 
 if __name__ == "__main__":
     log = logging.getLogger("__main__")
+    establish_bot_identity()
     if slack_client.rtm_connect():
         print("Bot connected and running!")
         establish_bot_identity()
