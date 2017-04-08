@@ -1,11 +1,7 @@
+import os
 import time
 from slackclient import SlackClient
-import groceries
-import os
-
-version = """
-I'm running version 0.0.1.
-"""
+from handlers import version, grocery, weather, feeds
 
 if os.path.exists('./overrides.py'):
     import overrides
@@ -20,6 +16,14 @@ READ_WEBSOCKET_DELAY = 2
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
+# Add more handlers here - just remember to add a help_text string in your module base, and have a "handle" method
+# that accepts a command text string, and handles it appropriately.
+handlers = {
+    'version': version,
+    'grocery': grocery,
+    'weather': weather,
+    'feeds': feeds
+}
 
 def handle_command(command, channel):
     """
@@ -27,46 +31,21 @@ def handle_command(command, channel):
     are valid commands.  If so, then it acts on the commands.  If not,
     returns back what it needs for clarification.
     """
-    ret = None
-    response = '\n'.join([
-        "Not sure what you mean.  :disappointed:",
-        "I support these commands:",
-        "`grocery <command>`",
-        "`version`",
-        "`who is <person name>`",
-        "",
-        "Try one of those commands."
-    ])
+    # Command is always the very first word - it is what puts us down a logical context path.
+    cmd = command.split()[0]
+    response = ""
+    if cmd not in handlers:
+        if cmd.lower() != 'help':
+            response += "Not sure what you mean.  :disappointed:\n"
+        response += "I support these commands:\n\n"
 
-    if command.startswith(EXAMPLE_COMMAND):
-        response = "Sure...  write some more code, then I can do that."  # TODO: Consider making the default a help printout.
-
-        
-    if command.startswith('demo'):
-        response = "This was done in Github!  Woo!"
-        
-    # Version of the bot.
-    elif command.startswith('version'):
-        response = version
-
-    # Support rudimentary who is behavior.
-    elif command.startswith('who is'):
-        if 'alisa' in command:
-            response = "Alisa is Ed's beautiful wife. :)"
-        elif 'ed' in command:
-            response = "Ed is Alisa's husband, and my creator."
-
-    # TODO: Consider handling bot shutdown / graceful restart.
-    #elif command.startswith('bot shutdown'):
-    #    response = "Ok... Shutting down."
-    #    ret = 'shutdown'
-
-    # Handle groceries.
-    elif command.startswith('grocery'):
-        response = groceries.handle(command)
+        for h in sorted(handlers.keys()):
+            response += handlers.get(h).help_text + '\n'
+            response += '\n'
+        response += "\nTry one of those commands."
+    else:
+        response = handlers.get(cmd).handle(command)
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
-
-    return ret
 
 
 def parse_slack_output(slack_rtm_output):
@@ -86,6 +65,20 @@ def parse_slack_output(slack_rtm_output):
                 print("Filtering out this: {}".format(repr(output)))
     return None, None
 
+
+def get_user_id_from_user_name(user_name):
+    api_call = slack_client.api_call("users.list")
+    if api_call.get('ok'):
+        users = api_call.get('members')
+        for user in users:
+            if 'name' in user and user.get('name') == user_name:
+                user_id = user.get('id')
+                print("User ID for '" + user_name + "' is: " + user.get('id'))
+                return user.get('id')
+    else:
+        print("could not find the user id with user name: " + user_name)
+        return None
+
 if __name__ == "__main__":
     if slack_client.rtm_connect():
         print("Bot connected and running!")
@@ -101,13 +94,4 @@ if __name__ == "__main__":
 
     # get bot name
     hide_me = """
-    api_call = slack_client.api_call("users.list")
-    if api_call.get('ok'):
-        # retrieve users
-        users = api_call.get('members')
-        for user in users:
-            if 'name' in user and user.get('name') == BOT_NAME:
-                print("Bot ID for '" + user['name'] + "' is: " + user.get('id'))
-    else:
-        print("could not find the bot with user name: " + BOT_NAME)
     """
