@@ -37,4 +37,5 @@ You'll need to add the following environment variables:
 
 Latitude and longitude location are passed to Darksky for finding your local weather info.
 
-All weather functionality is Powered by Darksky.  <a href="https://darksky.net/poweredby/"><img src="https://darksky.net/dev/img/attribution/poweredby-oneline.png" width="247px" height="56px"></a>
+All weather functionality is Powered by Darksky.
+<a href="https://darksky.net/poweredby/"><img src="https://darksky.net/dev/img/attribution/poweredby-oneline.png" width="247px" height="56px"></a>
