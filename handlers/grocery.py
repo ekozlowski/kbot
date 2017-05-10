@@ -2,7 +2,7 @@ help_text = "`grocery <command>` - Use `grocery help` for more info."
 
 grocery_list = []
 
-def handle(command):
+def handle(command, callback):
     global grocery_list
     pieces = command.split()
     response = '\n'.join([
@@ -15,11 +15,11 @@ def handle(command):
         "`grocery clear` clears your list.",
     ])
     if pieces[0].lower() == 'help':
-        return response
+        callback(response)
     try:
         action = pieces[1]
     except IndexError:
-        return response
+        callback(response)
     if pieces[2:]:
         o = ' '.join(pieces[2:])
     if action == 'add':
@@ -45,4 +45,4 @@ def handle(command):
     elif action == 'clear':
         grocery_list = []
         response = 'Grocery list cleared.  Hope you got what you needed...'
-    return response
+    callback(response)

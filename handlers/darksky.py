@@ -1,7 +1,7 @@
 """
 Adding Darksky Capability for weather.
 
-Darksky is copyright https://darksky.net - See 
+Darksky is copyright https://darksky.net
 """
 import datetime
 import requests

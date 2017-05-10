@@ -1,7 +1,7 @@
 import os
 import time
 from slackclient import SlackClient
-from handlers import version, grocery, feeds
+from handlers import version, grocery, feeds, minecraft
 import logging
 from functools import lru_cache
 
@@ -27,7 +27,8 @@ handlers = {
     'version': version,
     'grocery': grocery,
     'weather': weather,
-    'feeds': feeds
+    'feeds': feeds,
+    'minecraft': minecraft,
 }
 
 
@@ -35,6 +36,12 @@ def establish_bot_identity():
     global BOT_ID, AT_BOT
     BOT_ID = get_user_id_from_user_name(BOT_NAME)
     AT_BOT = f"<@{BOT_ID}>"
+
+
+def message_callback(channel, as_user):
+    def send(message):
+        slack_client.api_call("chat.postMessage", channel=channel, text=message, as_user=as_user)
+    return send
 
 
 def handle_command(command, channel):
@@ -55,9 +62,10 @@ def handle_command(command, channel):
             response += handlers.get(h).help_text + '\n'
             response += '\n'
         response += "\nTry one of those commands."
+        slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
     else:
-        response = handlers.get(cmd).handle(command)
-    slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
+        response = handlers.get(cmd).handle(command, message_callback(channel, as_user=True))
+
 
 
 def parse_slack_output(slack_rtm_output):
