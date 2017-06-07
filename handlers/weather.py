@@ -15,7 +15,8 @@ def preflight_check():
         ret += "You need to add your latitude and longitude to the 'LATITUDE' and 'LONGITUDE' environment variables.\n"
     return ret
 
-def handle(command):
+
+def handle(command, callback):
     msg = preflight_check()
     if msg:
         return msg
@@ -23,15 +24,14 @@ def handle(command):
     try:
         command = pieces[1]
     except IndexError:
-        return darksky.get_current_weather()
+        callback(darksky.get_current_weather())
     if command.lower() == 'help':
-        message = """
+        callback("""
 I can display a weather summary, or a weekly forecast.
 For a weekly forecast, tell me `@kbot weather weekly`.
 For current conditions, just tell me `@kbot weather`.
-
-        """
-        return message
+        """)
+        return
     if command.lower() == 'weekly':
-        return darksky.get_week_forecast()
+        callback(darksky.get_week_forecast())
 
