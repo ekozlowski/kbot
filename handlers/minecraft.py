@@ -52,6 +52,7 @@ def start_server(server_name):
 
 
 def set_dns(instance, fqdn, hosted_zone):
+    client = boto3.client('route53')
     response = client.change_resource_record_sets(
         HostedZoneId=hosted_zone,
         ChangeBatch={
@@ -114,15 +115,5 @@ def handle(command, callback):
             server_name='minecraft',
         )
 if __name__ == "__main__":
-    #start_server('minecraft')
-    ec2 = boto3.resource('ec2')
-    instance = ec2.Instance(servers.get('minecraft'))
-    print(instance)
-    print(repr(instance))
-    print(dir(instance))
-    print(instance.public_ip_address)
-    dns_name = instance.public_dns_name
-    print(dns_name)
-
-    client = boto3.client('route53')
-    print(dir(client))
+    start_server('minecraft')
+    
