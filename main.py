@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 if os.path.exists('./overrides.py'):
     import overrides
     overrides.main()
+
 from handlers import weather  # Have to import weather *after* the overrides, so it has the API key for DARKSKY.  :(
 
 
@@ -113,6 +114,7 @@ if __name__ == "__main__":
                 try:
                     handle_command(command, channel)
                 except Exception:
+                    raise
                     log.error(f"Problem handling command: {command} in channel {channel}")
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
