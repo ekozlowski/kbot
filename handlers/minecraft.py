@@ -4,6 +4,9 @@ This module handles spinning Minecraft servers up and down on AWS.
 Need to add idle detection, and shut down servers when idle.
 """
 
+help_text = "handles minecraft stuff"
+
+
 import boto3
 import threading
 
