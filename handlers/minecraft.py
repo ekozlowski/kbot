@@ -4,7 +4,7 @@ This module handles spinning Minecraft servers up and down on AWS.
 Need to add idle detection, and shut down servers when idle.
 """
 
-help_text = "handles minecraft stuff"
+help_text = """`minecraft (start|stop)` - Starts (or stops) the Minecraft Server"""
 
 
 import boto3
@@ -40,10 +40,10 @@ servers = {
     "minecraft": "i-09aeaf1cfcbf5eab0"
 }
 
+
 def start_server(server_name):
     client = boto3.client('ec2')
     client.start_instances(InstanceIds=[servers.get(server_name)])
-
 
 
 def bring_up_minecraft():
@@ -61,7 +61,6 @@ def stop_server(server_name):
 
 
 def shut_down_ftb():
-    # shut down ftb server
     pass
 
 
