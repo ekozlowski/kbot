@@ -5,8 +5,7 @@ Need to add idle detection, and shut down servers when idle.
 """
 
 help_text = """`minecraft (start|stop)` - Starts (or stops) the Minecraft Server"""
-
-
+import os
 import boto3
 import threading
 
@@ -42,9 +41,39 @@ servers = {
 
 
 def start_server(server_name):
-    client = boto3.client('ec2')
-    client.start_instances(InstanceIds=[servers.get(server_name)])
+    ec2 = boto3.resource('ec2')
+    instance = ec2.Instance(servers.get(server_name))
+    instance.start()
+    instance.wait_until_running()
+    fqdn = os.environ.get("MINECRAFT_FQDN")
+    hosted_zone = os.environ.get("MINECRAFT_HOSTED_ZONE")
+    if fqdn and hosted_zone:
+        set_dns(instance, fqdn, hosted_zone)
 
+
+def set_dns(instance, fqdn, hosted_zone):
+    response = client.change_resource_record_sets(
+        HostedZoneId=hosted_zone,
+        ChangeBatch={
+            "Comment": "Automatic DNS update",
+            "Changes": [
+                {
+                    "Action": "UPSERT",
+                    "ResourceRecordSet": {
+                        "Name": fqdn,
+                        "Type": "CNAME",
+                        "TTL": 180,
+                        "ResourceRecords": [
+                            {
+                                "Value": instance.public_dns_name,
+                            },
+                        ],
+                    }
+                },
+            ]
+        }
+    )
+    print(response)
 
 def bring_up_minecraft():
     start_server('minecraft')
@@ -56,8 +85,10 @@ def bring_up_ftb():
 
 
 def stop_server(server_name):
-    client = boto3.client('ec2')
-    client.stop_instances(InstanceIds=[servers.get(server_name)], Force=False)
+    ec2 = boto3.resource('ec2')
+    instance = ec2.Instance(servers.get(server_name))
+    instance.stop()
+    instance.wait_until_stopped()
 
 
 def shut_down_ftb():
@@ -83,4 +114,15 @@ def handle(command, callback):
             server_name='minecraft',
         )
 if __name__ == "__main__":
-    handle('minecraft start', 'eh')
+    #start_server('minecraft')
+    ec2 = boto3.resource('ec2')
+    instance = ec2.Instance(servers.get('minecraft'))
+    print(instance)
+    print(repr(instance))
+    print(dir(instance))
+    print(instance.public_ip_address)
+    dns_name = instance.public_dns_name
+    print(dns_name)
+
+    client = boto3.client('route53')
+    print(dir(client))
