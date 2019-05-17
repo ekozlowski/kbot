@@ -10,8 +10,6 @@ import boto3
 import threading
 
 
-import uuid
-
 tasks = {}
 
 class Task(threading.Thread):
