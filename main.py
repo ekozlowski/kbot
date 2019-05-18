@@ -1,6 +1,6 @@
 import os
 import time
-from slackclient import SlackClient
+from slack import WebClient
 from handlers import version, grocery, feeds, minecraft
 import logging
 from functools import lru_cache
@@ -23,7 +23,7 @@ BOT_ID = None  # Established after we connect to Slack
 AT_BOT = None  # Established after we connect to Slack
 READ_WEBSOCKET_DELAY = 2
 
-slack_client = SlackClient(SLACK_BOT_TOKEN)
+slack_client = WebClient(token=SLACK_BOT_TOKEN)
 
 # Add more handlers here - just remember to add a help_text string in your module base, and have a "handle" method
 # that accepts a command text string, and handles it appropriately.
