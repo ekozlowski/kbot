@@ -9,9 +9,9 @@ from functools import lru_cache
 @lru_cache(maxsize=1, typed=False)
 def preflight_check():
     ret = ""
-    if not os.environ.get('DARKSKY_API_KEY'):
+    if not os.environ.get("DARKSKY_API_KEY"):
         ret += "You need to add your Darksky API key to the DARKSKY_API_KEY.\n"
-    if not os.environ.get('LATITUDE') or not os.environ.get('LONGITUDE'):
+    if not os.environ.get("LATITUDE") or not os.environ.get("LONGITUDE"):
         ret += "You need to add your latitude and longitude to the 'LATITUDE' and 'LONGITUDE' environment variables.\n"
     return ret
 
@@ -25,13 +25,14 @@ def handle(command, callback):
         command = pieces[1]
     except IndexError:
         callback(darksky.get_current_weather())
-    if command.lower() == 'help':
-        callback("""
+    if command.lower() == "help":
+        callback(
+            """
 I can display a weather summary, or a weekly forecast.
 For a weekly forecast, tell me `@kbot weather weekly`.
 For current conditions, just tell me `@kbot weather`.
-        """)
+        """
+        )
         return
-    if command.lower() == 'weekly':
+    if command.lower() == "weekly":
         callback(darksky.get_week_forecast())
-
