@@ -63,3 +63,12 @@ If you want your route53 DNS automatically updated when you start your server, y
 - `MINECRAFT_HOSTED_ZONE` - This is the "Hosted Zone ID" in Route53.  We need this so we CNAME the URL to the right place.
 
 Now when Kbot starts your minecraft server, you won't have to futz with giving people a long URL, or mapping Route53 yourself. :)
+
+#### Changelog
+
+0.0.2
+- Reformatted some code using the Python Black package
+- Changed dependency management to use pipenv instead of a virtualenv with a 
+requirements.txt file.
+- If a weather icon is not found, we default to just displaying the key text
+that was tried in the lookup for an icon.

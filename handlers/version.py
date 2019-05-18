@@ -7,4 +7,4 @@ def handle(command, callback):
     :param command:
     :return:
     """
-    callback("I'm running version 0.0.1")
+    callback("I'm running version 0.0.2")
