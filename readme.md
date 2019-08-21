@@ -66,6 +66,9 @@ Now when Kbot starts your minecraft server, you won't have to futz with giving p
 
 #### Changelog
 
+0.0.3
+- Added github workflows
+
 0.0.2
 - Reformatted some code using the Python Black package
 - Changed dependency management to use pipenv instead of a virtualenv with a 
