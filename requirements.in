@@ -1,0 +1,11 @@
+boto3
+botocore
+docutils
+feedparser
+jmespath
+python-dateutil
+requests
+s3transfer
+six
+slackclient
+websocket_client
